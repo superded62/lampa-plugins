@@ -1,44 +1,49 @@
 (function () {
-    var plugin = {};
+    function startPlugin() {
+        // Добавляем пункт в меню
+        Lampa.SettingsApi.addParam({
+            component: 'more',          // раздел меню "Еще"
+            param: {
+                name: 'my_section',     // уникальный идентификатор
+                type: 'button',
+                title: '📺 Мой раздел',
+                onClick: function () {
+                    // при нажатии показываем уведомление
+                    Lampa.Noty.show('Привет из моего плагина! 🎉');
 
-    plugin.id = 'my_plugin';
-    plugin.version = '1.0.0';
-    plugin.name = 'Мой плагин';
-    plugin.description = 'Пример простого плагина для Lampa';
+                    // можно вывести список фильмов/сериалов
+                    let items = [
+                        {
+                            title: 'Тестовый фильм',
+                            year: 2024,
+                            poster: 'https://image.tmdb.org/t/p/w200/8UlWHLMpgZm9bx6QYh0NFoq67TZ.jpg',
+                            url: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ'
+                        }
+                    ];
 
-    plugin.run = function () {
-        console.log('Мой плагин запущен');
+                    let object = {
+                        title: 'Мой раздел',
+                        results: items,
+                        onBack: function () {
+                            Lampa.Controller.toggle('content');
+                        }
+                    };
 
-        // Добавляем пункт в главное меню
-        Lampa.Listener.send('menu_main', {
-            type: 'add',
-            title: 'Мой раздел',
-            url: 'plugin://my_plugin'
-        });
-
-        // Реакция на открытие меню
-        Lampa.Listener.follow('app', function (e) {
-            if (e.type === 'open' && e.url === 'plugin://my_plugin') {
-                Lampa.Activity.push({
-                    url: 'plugin://my_plugin/page',
-                    component: 'full',
-                    type: 'card',
-                    title: 'Привет из моего плагина',
-                    data: {
-                        results: [
-                            {
-                                title: 'Тестовый фильм',
-                                release_year: 2024,
-                                poster: 'https://upload.wikimedia.org/wikipedia/ru/c/c1/The_Matrix_Poster.jpg'
-                            }
-                        ]
-                    }
-                });
+                    Lampa.Activity.push(object);
+                }
+            },
+            field: {
+                name: 'Мой раздел'
             }
         });
-    };
+    }
 
-    Lampa.Plugins.add(plugin);
+    // Регистрируем плагин
+    Lampa.PluginApi.add({
+        id: 'my_section',
+        name: 'Мой раздел',
+        version: '1.0',
+        description: 'Тестовый плагин для Лампы',
+        onStart: startPlugin
+    });
 })();
-
-
